@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Book an Event - d'sis Catering</title>
+  <link rel="stylesheet" href="book.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+</head>
+<body>
+  <header>
+    <div class="logo-container">
+      <button onclick="history.back()" class="btn btn-outline-secondary">←</button>
+      <img src="img/logo.png" alt="d'sis Catering Logo" class="header-logo">
+      <div class="logo">d'sis Catering</div>
+    </div>
+    <nav>
+      <ul>
+        <li><a href="main.html">Home</a></li>
+        <li><a href="menu.html">Menu</a></li>
+        <li><a href="album.html">Design</a></li>
+        <li><a href="other_offers.html">Other Offers</a></li>
+        <li><a href="message.html" class="contact-btn"><i class="fas fa-envelope"></i> Messages</a></li>
+        <li><a href="login.html"><i class="fas fa-user-circle" style="font-size: 24px;"></i></a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <div class="booking-container">
+      <div class="booking-info">
+        <h1>Book An Event</h1>
+        <p class="sub-header">Book your catering experience with ease!</p>
+        <p>Planning an event? Let us handle the food! Whether it's a wedding, corporate gathering, birthday party, or any special occasion, we offer customized catering solutions to fit your needs.</p>
+        <hr>
+        <h2 style="text-align: center; margin-top: 13px;">Pick Your Desired Food Here</h2>
+        <p style="text-align: center;">Satisfy your cravings from the variety of delicious goodness that awaits you.<br>Build your menu now!</p>
+        <a href="build.html" class="btn btn-dark menu-btn">Look through the Menu!</a>
+      </div>
+
+      <div class="booking-form-container">
+        <form action="#" method="POST">
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="first-name">First Name</label>
+              <input type="text" id="first-name" name="first-name" required>
+            </div>
+            <div class="form-group">
+              <label for="last-name">Last Name</label>
+              <input type="text" id="last-name" name="last-name" required>
+            </div>
+            <div class="form-group full-width">
+              <label for="email">Email</label>
+              <input type="email" id="email" name="email" required>
+            </div>
+            <div class="form-group full-width">
+              <label for="contact-number">Contact Number</label>
+              <input type="text" id="contact-number" name="contact-number" required>
+            </div>
+            <div class="form-group full-width">
+              <label for="occasion">Occasion</label>
+              <select id="occasion" name="occasion" required>
+                <option value="">Select Occasion</option>
+                <option value="wedding">Wedding (Premium Package - 1.5x multiplier + ₱2,000 styling)</option>
+                <option value="anniversary">Anniversary (1.4x multiplier + ₱1,500 styling)</option>
+                <option value="corporate">Corporate Event (1.3x multiplier + ₱1,200 styling)</option>
+                <option value="christening">Christening (1.3x multiplier + ₱1,200 styling)</option>
+                <option value="birthday">Birthday (1.2x multiplier + ₱800 styling)</option>
+                <option value="graduation">Graduation (1.2x multiplier + ₱1,000 styling)</option>
+                <option value="reunion">Family Reunion (1.1x multiplier + ₱600 styling)</option>
+                <option value="other">Other (Standard Package - 1.0x multiplier + ₱500 styling)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="event-date">Event Date</label>
+              <input type="date" id="event-date" name="event-date" required>
+            </div>
+            <div class="form-group">
+              <label for="num-guests">Number of Guests</label>
+              <input type="number" id="num-guests" name="num-guests" min="1" required>
+            </div>
+            <div class="form-group full-width">
+              <label for="event-venue">Event Venue</label>
+              <input type="text" id="event-venue" name="event-venue" required>
+            </div>
+            <div class="form-group full-width">
+              <label for="additional-instructions">Additional Instructions</label>
+              <textarea id="additional-instructions" name="instructions" rows="5"></textarea>
+            </div>
+          </div>
+
+          <div class="menu-selection" style="margin-top:30px;padding:20px;border:1px solid #ddd;border-radius:10px;">
+            <h3>Select Menu Items</h3>
+            <div id="menu-items-container"></div>
+            <div style="margin-top:20px;padding:15px;background:#f8f9fa;border-radius:5px;">
+              <div id="occasion-info" style="margin-bottom:15px;padding:10px;background:#e9ecef;border-radius:5px;font-size:0.9em;">
+                <strong>Standard Package</strong><br>
+                <small>Food Cost Multiplier: 1.0x | Styling Fee: ₱500.00</small>
+              </div>
+              <div style="display:flex;justify-content:space-between;margin-bottom:10px;">
+                <span>Total Amount:</span>
+                <span style="font-weight:bold;">₱<span id="total-amount">0.00</span></span>
+              </div>
+              <div style="display:flex;justify-content:space-between;font-size:1.1em;color:#007bff;font-weight:bold;border-top:1px solid #ddd;padding-top:10px;">
+                <span>Per Person Cost:</span>
+                <span>₱<span id="per-person-amount">0.00</span></span>
+              </div>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-dark submit-btn">Submit Booking & Generate Receipt</button>
+        </form>
+      </div>
+    </div>
+  </main>
+
+  <footer></footer>
+
+  <script src="js/api.js"></script>
+  <script src="auth.js"></script>
+  <script src="receipt.js"></script>
+  <script>
+    const API_BASE_URL = 'http://localhost:3000/api';
+    let menuItems = [];
+    let selectedItems = [];
+
+    const occasionPricing = {
+      wedding: { multiplier: 1.5, stylingFee: 2000, description: 'Premium Wedding Package' },
+      birthday: { multiplier: 1.2, stylingFee: 800, description: 'Birthday Celebration Package' },
+      corporate: { multiplier: 1.3, stylingFee: 1200, description: 'Corporate Event Package' },
+      anniversary: { multiplier: 1.4, stylingFee: 1500, description: 'Anniversary Celebration Package' },
+      graduation: { multiplier: 1.2, stylingFee: 1000, description: 'Graduation Party Package' },
+      christening: { multiplier: 1.3, stylingFee: 1200, description: 'Christening Celebration Package' },
+      reunion: { multiplier: 1.1, stylingFee: 600, description: 'Family Reunion Package' },
+      other: { multiplier: 1.0, stylingFee: 500, description: 'Standard Package' },
+      default: { multiplier: 1.0, stylingFee: 500, description: 'Standard Package' }
+    };
+
+    function getOccasionPricing(occasion) {
+      const key = occasion.toLowerCase().trim();
+      return occasionPricing[key] || occasionPricing.default;
+    }
+
+    async function loadMenuItems() {
+      try {
+        const response = await fetch(`${API_BASE_URL}/menu`);
+        const data = await response.json();
+        menuItems = data.items || [];
+        initializeMenuSelection();
+      } catch {
+        showFallbackMenu();
+      }
+    }
+
+    function showFallbackMenu() {
+      menuItems = [
+        { id: 1, itemName: 'Lechon', pricePerServing: 500, category: 'Main Course' },
+        { id: 2, itemName: 'Chicken Cordon Bleu', pricePerServing: 350, category: 'Main Course' },
+        { id: 3, itemName: 'Lasagna', pricePerServing: 300, category: 'Main Course' },
+        { id: 4, itemName: 'Shanghai Rolls', pricePerServing: 200, category: 'Appetizer' },
+        { id: 5, itemName: 'Fruit Salad', pricePerServing: 150, category: 'Dessert' },
+        { id: 6, itemName: 'Rice', pricePerServing: 50, category: 'Side Dish' },
+        { id: 7, itemName: 'Soft Drinks', pricePerServing: 30, category: 'Beverage' },
+        { id: 8, itemName: 'Cucumber Juice', pricePerServing: 80, category: 'Beverage' }
+      ];
+      initializeMenuSelection();
+    }
+
+    function initializeMenuSelection() {
+      const container = document.getElementById('menu-items-container');
+      container.innerHTML = '';
+      menuItems.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'menu-item';
+        div.style.cssText = 'display:flex;justify-content:space-between;align-items:center;padding:10px;border:1px solid #ddd;border-radius:5px;margin-bottom:10px;';
+        div.innerHTML = `
+          <div>
+            <strong>${item.itemName}</strong><br>
+            <small style="color:#666;">${item.category} - ₱${item.pricePerServing}</small>
+          </div>
+          <div style="display:flex;align-items:center;">
+            <button type="button" onclick="updateQuantity(${item.id}, -1)" style="margin-right:10px;">-</button>
+            <span id="qty-${item.id}" style="margin:0 10px;">0</span>
+            <button type="button" onclick="updateQuantity(${item.id}, 1)" style="margin-left:10px;">+</button>
+          </div>`;
+        container.appendChild(div);
+      });
+    }
+
+    function updateQuantity(id, change) {
+      const item = menuItems.find(i => i.id === id);
+      const existing = selectedItems.find(s => s.id === id);
+      const qty = Math.max(0, (existing?.quantity || 0) + change);
+      if (qty === 0) selectedItems = selectedItems.filter(s => s.id !== id);
+      else if (existing) existing.quantity = qty;
+      else selectedItems.push({ id, name: item.itemName, price: item.pricePerServing, quantity: qty });
+      document.getElementById(`qty-${id}`).textContent = qty;
+      updateTotal();
+    }
+
+    function updateTotal() {
+      const guests = parseInt(document.getElementById('num-guests').value) || 1;
+      const occasion = document.getElementById('occasion').value;
+      const o = getOccasionPricing(occasion);
+      const base = selectedItems.reduce((sum, i) => sum + i.price * i.quantity, 0);
+      const total = base * o.multiplier + o.stylingFee;
+      const perPerson = total / guests;
+      document.getElementById('total-amount').textContent = total.toFixed(2);
+      document.getElementById('per-person-amount').textContent = perPerson.toFixed(2);
+      document.getElementById('occasion-info').innerHTML = `<strong>${o.description}</strong><br><small>Food Cost Multiplier: ${o.multiplier}x | Styling Fee: ₱${o.stylingFee.toFixed(2)}</small>`;
+    }
+
+    document.addEventListener('DOMContentLoaded', loadMenuItems);
+
+    // Handle form submission: create booking then generate/display receipt
+    document.addEventListener('DOMContentLoaded', function () {
+      const form = document.querySelector('.booking-form-container form');
+      if (!form) return;
+
+      // Prefill booking form with saved signup/login data
+      const storedUserRaw = localStorage.getItem('dsis_user');
+      if (storedUserRaw) {
+        try {
+          const storedUser = JSON.parse(storedUserRaw);
+          document.getElementById('first-name').value = storedUser.firstName || '';
+          document.getElementById('last-name').value = storedUser.lastName || '';
+          document.getElementById('email').value = storedUser.email || '';
+          document.getElementById('contact-number').value = storedUser.mobileNumber || storedUser.phoneNumber || '';
+        } catch (e) {
+          console.warn('Failed to parse stored user info:', e);
+        }
+      }
+
+      form.addEventListener('submit', async function (e) {
+        e.preventDefault();
+        try {
+          const userRaw = localStorage.getItem('dsis_user');
+          if (!userRaw) {
+            alert('Please log in before booking.');
+            window.location.href = 'login.html';
+            return;
+          }
+
+          if (!selectedItems.length) {
+            alert('Please select at least one menu item.');
+            return;
+          }
+
+          const bookingData = {
+            firstName: document.getElementById('first-name').value.trim(),
+            lastName: document.getElementById('last-name').value.trim(),
+            email: document.getElementById('email').value.trim(),
+            contactNumber: document.getElementById('contact-number').value.trim(),
+            occasion: document.getElementById('occasion').value,
+            eventDate: document.getElementById('event-date').value,
+            numGuests: document.getElementById('num-guests').value,
+            eventVenue: document.getElementById('event-venue').value.trim(),
+            instructions: document.getElementById('additional-instructions').value.trim()
+          };
+
+          // Create booking and generate receipt via API
+          const receipt = await receiptSystem.generateReceipt(bookingData, selectedItems);
+
+          // Show receipt modal
+          receiptSystem.displayReceipt(receipt);
+
+          // Optionally reset form
+          // form.reset();
+          // selectedItems = [];
+          // initializeMenuSelection();
+          // updateTotal();
+
+        } catch (err) {
+          console.error('Booking/Receipt error:', err);
+          alert(err?.data?.error || err?.message || 'Failed to submit booking. Please try again.');
+        }
+      });
+
+      // Update totals when inputs change
+      ['num-guests', 'occasion'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.addEventListener('change', updateTotal);
+      });
+    });
+  </script>
+</body>
+</html>
